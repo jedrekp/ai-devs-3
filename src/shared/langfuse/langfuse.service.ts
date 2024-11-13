@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Langfuse, { LangfuseGenerationClient } from 'langfuse';
+import Langfuse, { LangfuseGenerationClient, LangfuseTraceClient } from 'langfuse';
 
 @Injectable()
 export class LangfuseService {
@@ -18,11 +18,12 @@ export class LangfuseService {
     });
   }
 
-  createGeneration(name: string, input: unknown): LangfuseGenerationClient {
-    return this.client.generation({
+  createGeneration(name: string, input: unknown, trace?: LangfuseTraceClient): LangfuseGenerationClient {
+    const body = {
       name,
-      input: JSON.stringify(input)
-    });
+      input: typeof input === 'string' ? input : JSON.stringify(input)
+    };
+    return trace ? trace.generation(body) : this.client.generation(body);
   }
 
   finalizeGeneration(

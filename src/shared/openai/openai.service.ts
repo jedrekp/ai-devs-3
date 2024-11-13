@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { LangfuseTraceClient } from 'langfuse';
 import OpenAI from 'openai';
 import { ChatCompletionMessageParam, ChatModel } from 'openai/resources';
 import { LangfuseService } from '../langfuse/langfuse.service';
@@ -13,7 +14,11 @@ export class OpenaiService {
   async singleQuery(
     title: string,
     userQuery: string,
-    settings?: { systemPrompt?: string; model?: ChatModel }
+    settings?: {
+      systemPrompt?: string;
+      model?: ChatModel;
+      trace?: LangfuseTraceClient;
+    }
   ): Promise<string> {
     const model = settings?.model ?? 'gpt-4';
     const messages: Array<ChatCompletionMessageParam> = [
@@ -21,7 +26,7 @@ export class OpenaiService {
       { role: 'user', content: userQuery }
     ];
 
-    const generation = this.langfuseService.createGeneration(title, messages);
+    const generation = this.langfuseService.createGeneration(title, messages, settings?.trace);
 
     const result = await this.client.chat.completions.create({
       messages,
