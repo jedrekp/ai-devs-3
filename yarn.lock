@@ -733,6 +733,13 @@
     jsonc-parser "3.3.1"
     pluralize "8.0.0"
 
+"@nestjs/serve-static@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.npmjs.org/@nestjs/serve-static/-/serve-static-4.0.2.tgz"
+  integrity sha512-cT0vdWN5ar7jDI2NKbhf4LcwJzU4vS5sVpMkVrHuyLcltbrz6JdGi1TfIMMatP2pNiq5Ie/uUdPSFDVaZX/URQ==
+  dependencies:
+    path-to-regexp "0.2.5"
+
 "@nestjs/testing@^10.0.0":
   version "10.4.7"
   resolved "https://registry.npmjs.org/@nestjs/testing/-/testing-10.4.7.tgz"
@@ -3469,14 +3476,14 @@ kleur@^3.0.3:
 
 langfuse-core@^3.29.1:
   version "3.29.1"
-  resolved "https://registry.yarnpkg.com/langfuse-core/-/langfuse-core-3.29.1.tgz#6aeaf5ad991293cb7328c5faf8881bfc472b6231"
+  resolved "https://registry.npmjs.org/langfuse-core/-/langfuse-core-3.29.1.tgz"
   integrity sha512-sH+clcJA4xdhGxeJhJ/EqdZQk2z8zMwt1tw5zTyndUUaMfhNMIr5g4UR91nE37vbQtilWwXW0b3FInJJinriNw==
   dependencies:
     mustache "^4.2.0"
 
 langfuse@^3.29.1:
   version "3.29.1"
-  resolved "https://registry.yarnpkg.com/langfuse/-/langfuse-3.29.1.tgz#84054a4a2199f58d8e20115b0cf1ee4046413271"
+  resolved "https://registry.npmjs.org/langfuse/-/langfuse-3.29.1.tgz"
   integrity sha512-lGh/4yUdjpHcCnp2zNZiyAxgDHbFGD3te6ONjuL7I9REf++49k+gpycMTNEAo6sQHFbhiuB1FO345pAOR2+R8A==
   dependencies:
     langfuse-core "^3.29.1"
@@ -3716,7 +3723,7 @@ multer@1.4.4-lts.1:
 
 mustache@^4.2.0:
   version "4.2.0"
-  resolved "https://registry.yarnpkg.com/mustache/-/mustache-4.2.0.tgz#e5892324d60a12ec9c2a73359edca52972bf6f64"
+  resolved "https://registry.npmjs.org/mustache/-/mustache-4.2.0.tgz"
   integrity sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==
 
 mute-stream@0.0.8:
@@ -3958,6 +3965,11 @@ path-to-regexp@0.1.10:
   version "0.1.10"
   resolved "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.1.10.tgz"
   integrity sha512-7lf7qcQidTku0Gu3YDPc8DJ1q7OOucfa/BSsIwjuh56VU7katFvuM8hULfkwB3Fns/rsVF7PwPKVw1sl5KQS9w==
+
+path-to-regexp@0.2.5:
+  version "0.2.5"
+  resolved "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.2.5.tgz"
+  integrity sha512-l6qtdDPIkmAmzEO6egquYDfqQGPMRNGjYtrU13HAXb3YSRrt7HSb1sJY0pKp6o2bAa86tSB6iwaW2JbthPKr7Q==
 
 path-to-regexp@3.3.0:
   version "3.3.0"
@@ -4784,7 +4796,7 @@ utils-merge@1.0.1:
 
 uuid@^11.0.3:
   version "11.0.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.0.3.tgz#248451cac9d1a4a4128033e765d137e2b2c49a3d"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-11.0.3.tgz"
   integrity sha512-d0z310fCWv5dJwnX1Y/MncBAqGMKEzlBb1AOf7z9K8ALnd0utBX/msg/fA0+sbyN1ihbMsLhrBlnl1ak7Wa0rg==
 
 v8-compile-cache-lib@^3.0.1:
