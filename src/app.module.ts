@@ -8,6 +8,7 @@ import { Task2Module } from './tasks/task2/task2.module';
 import { Task3Module } from './tasks/task3/task3.module';
 import { Task5Module } from './tasks/task5/task5.module';
 import { Task6Module } from './tasks/task6/task6.module';
+import { Task7Module } from './tasks/task7/task7.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { Task6Module } from './tasks/task6/task6.module';
     Task2Module,
     Task3Module,
     Task5Module,
-    Task6Module
+    Task6Module,
+    Task7Module
   ]
 })
 export class AppModule {}

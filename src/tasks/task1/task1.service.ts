@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpClientService } from 'src/shared/http-client/http-client.service';
+import { LangfuseService } from 'src/shared/langfuse/langfuse.service';
 import { OpenaiService } from 'src/shared/openai/openai.service';
-import { answerQuestionFromHtmlPrompt } from './task1.prompt';
 
 @Injectable()
 export class Task1Service {
   private readonly taskName = 'LOGINPAGE';
+  private readonly answerHtmlQuestionPromptName = 'ANSWER_QUESTION_IN_HTML';
   private readonly loginPageUrl: string;
   private readonly username: string;
   private readonly password: string;
@@ -14,6 +15,7 @@ export class Task1Service {
   constructor(
     private readonly http: HttpClientService,
     private readonly openaiService: OpenaiService,
+    private readonly langfuseService: LangfuseService,
     configService: ConfigService
   ) {
     this.loginPageUrl = configService.get<string>('AGENTS_API_URL');
@@ -28,7 +30,7 @@ export class Task1Service {
       username: this.username,
       password: this.password,
       answer: await this.openaiService.singleQuery(this.taskName, loginPageHtml, {
-        systemPrompt: answerQuestionFromHtmlPrompt()
+        systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerHtmlQuestionPromptName)
       })
     };
 

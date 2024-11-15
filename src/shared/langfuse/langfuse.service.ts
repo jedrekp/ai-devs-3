@@ -18,6 +18,11 @@ export class LangfuseService {
     });
   }
 
+  async getCompiledPrompt(name: string, variables?: Record<string, string>): Promise<string> {
+    const prompt = await this.client.getPrompt(name);
+    return prompt.compile(variables);
+  }
+
   createGeneration(name: string, input: unknown, trace?: LangfuseTraceClient): LangfuseGenerationClient {
     const body = {
       name,

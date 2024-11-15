@@ -19,6 +19,7 @@ export class OpenaiService {
       model?: ChatModel;
       trace?: LangfuseTraceClient;
       jsonMode?: boolean;
+      temperature?: number;
     }
   ): Promise<string> {
     const model = settings?.model ?? 'gpt-4o';
@@ -32,6 +33,57 @@ export class OpenaiService {
     const result = await this.client.chat.completions.create({
       messages,
       model,
+      temperature: settings.temperature ?? 1.0,
+      ...(settings.jsonMode && { response_format: { type: 'json_object' } })
+    });
+
+    const agentResponse = result.choices[0].message.content;
+
+    this.langfuseService.finalizeGeneration(generation, agentResponse, model, {
+      promptTokens: result.usage?.prompt_tokens,
+      completionTokens: result.usage?.completion_tokens,
+      totalTokens: result.usage?.total_tokens
+    });
+
+    return agentResponse;
+  }
+
+  async singleImageQuery(
+    title: string,
+    base64EncodedImage: string,
+    fileExtension: string,
+    settings?: {
+      systemPrompt?: string;
+      model?: ChatModel;
+      trace?: LangfuseTraceClient;
+      jsonMode?: boolean;
+      detail?: 'high' | 'auto' | 'low';
+      temperature?: number;
+    }
+  ): Promise<string> {
+    const model = settings?.model ?? 'gpt-4o';
+    const messages: Array<ChatCompletionMessageParam> = [
+      { role: 'system', content: settings?.systemPrompt ?? '' },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/${fileExtension};base64,${base64EncodedImage}`,
+              detail: settings?.detail ?? 'auto'
+            }
+          }
+        ]
+      }
+    ];
+
+    const generation = this.langfuseService.createGeneration(title, messages, settings?.trace);
+
+    const result = await this.client.chat.completions.create({
+      messages,
+      model,
+      temperature: settings.temperature ?? 1.0,
       ...(settings.jsonMode && { response_format: { type: 'json_object' } })
     });
 

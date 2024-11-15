@@ -8,5 +8,6 @@ export class Task6Controller {
   @Get()
   async executeTask6(): Promise<{ code: number; message: string }> {
     return this.task6Service.executeTask6('Na jakiej ulicy znajduje się uczelnia, na której wykłada Andrzej Maj?');
+    //TODO => change to post request.
   }
 }

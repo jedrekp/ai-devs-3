@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { HttpClientService } from 'src/shared/http-client/http-client.service';
+import { LangfuseService } from 'src/shared/langfuse/langfuse.service';
 import { OpenaiService } from 'src/shared/openai/openai.service';
-import { contextBasedQuestionAnsweringPrompt } from './task6.prompt';
 
 @Injectable()
 export class Task6Service {
@@ -12,6 +12,7 @@ export class Task6Service {
   private readonly inputFileExtension = 'm4a';
   private task6AssetsDirectory = join(__dirname, '..', '..', '..', 'assets', 'task6');
   private readonly interrogatees = ['adam', 'agnieszka', 'ardian', 'michal', 'monika', 'rafal'];
+  private readonly contextBasedAnswerPromptName = 'CONTEXT_BASED_SINGLE_QUESTION_ANSWER';
   private readonly centralaAgentsApiKey: string;
   private readonly reportUrl: string;
 
@@ -20,6 +21,7 @@ export class Task6Service {
   constructor(
     private readonly http: HttpClientService,
     private readonly openaiService: OpenaiService,
+    private readonly langfuseService: LangfuseService,
     configService: ConfigService
   ) {
     const centralaAgentsApiUrl = configService.get<string>('CENTRALA_AGENTS_API_URL');
@@ -48,7 +50,7 @@ export class Task6Service {
 
     const context = transcriptions.map(data => `${data.name}:\n${data.transcription}`).join('\n\n');
     const agentResponse = await this.openaiService.singleQuery(this.taskName, userQuery, {
-      systemPrompt: contextBasedQuestionAnsweringPrompt(context),
+      systemPrompt: await this.langfuseService.getCompiledPrompt(this.contextBasedAnswerPromptName, { context }),
       jsonMode: true
     });
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpClientService } from 'src/shared/http-client/http-client.service';
+import { LangfuseService } from 'src/shared/langfuse/langfuse.service';
 import { OpenaiService } from 'src/shared/openai/openai.service';
-import { answerMultipleQuestionsPrompt } from './task3.prompt';
 import {
   isTestDataExtendedQuestion as isTestDataExtendedItem,
   OpenQuestion,
@@ -14,6 +14,7 @@ import {
 @Injectable()
 export class Task3Service {
   private readonly taskName = 'JSON';
+  private readonly answerMultipleQuestionsPromptName = 'ANSWER_MULTIPLE_QUESTIONS';
   private readonly centralaAgentsApiUrl: string;
   private readonly centralaAgentsApiKey: string;
   private readonly inputDataUrl: string;
@@ -22,6 +23,7 @@ export class Task3Service {
   constructor(
     private readonly http: HttpClientService,
     private readonly openaiService: OpenaiService,
+    private readonly langfuseService: LangfuseService,
     configService: ConfigService
   ) {
     this.centralaAgentsApiUrl = configService.get<string>('CENTRALA_AGENTS_API_URL');
@@ -68,7 +70,7 @@ export class Task3Service {
 
   private async resolveOpenQuestions(openQuestions: OpenQuestion[]) {
     const resolvedOpenQuestions = await this.openaiService.singleQuery(this.taskName, JSON.stringify(openQuestions), {
-      systemPrompt: answerMultipleQuestionsPrompt()
+      systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerMultipleQuestionsPromptName)
     });
     return JSON.parse(resolvedOpenQuestions) as OpenQuestion[];
   }
