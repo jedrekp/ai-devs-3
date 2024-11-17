@@ -39,7 +39,8 @@ export class Task6Service {
         const filePath = join(this.task6AssetsDirectory, `${name}.${this.inputFileExtension}`);
         const fileBuffer = await fs.readFile(filePath);
         const transcription = await this.openaiService.transcribe(this.taskName, fileBuffer, this.inputFileExtension, {
-          description: name
+          description: name,
+          language: 'pl'
         });
 
         this.transcriptionsCache.set(name, transcription);

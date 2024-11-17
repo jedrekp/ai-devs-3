@@ -110,13 +110,12 @@ export class OpenaiService {
     }
   ): Promise<string> {
     const model = settings?.model ?? 'whisper-1';
-    const language = settings?.language ?? 'pl';
     const generation = this.langfuseService.createGeneration(name, settings?.description ?? name, settings?.trace);
 
     const result = await this.client.audio.transcriptions.create({
       file: await toFile(audioBuffer, `${name}.${fileExtension}`),
-      language,
-      model
+      model,
+      ...(settings?.language && { language: settings.language })
     });
     const transcription = result.text;
 

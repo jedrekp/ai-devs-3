@@ -6,7 +6,7 @@ export class Task8Controller {
   constructor(private task8Service: Task8Service) {}
 
   @Get()
-  executeTask8(): Promise<any> {
+  executeTask8(): Promise<{ code: number; message: string }> {
     return this.task8Service.executeTask8();
   }
 }
