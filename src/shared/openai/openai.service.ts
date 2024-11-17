@@ -124,4 +124,27 @@ export class OpenaiService {
 
     return transcription;
   }
+
+  async generateImage(
+    title: string,
+    imageDescription: string,
+    settings?: { model?: ChatModel; trace?: LangfuseTraceClient }
+  ): Promise<string> {
+    const model = settings?.model ?? 'dall-e-3';
+    const generation = this.langfuseService.createGeneration(title, imageDescription, settings?.trace);
+
+    const response = await this.client.images.generate({
+      model,
+      prompt: imageDescription,
+      n: 1,
+      size: '1024x1024',
+      response_format: 'url'
+    });
+
+    const imageUrl = response.data[0].url;
+
+    this.langfuseService.finalizeGeneration(generation, imageUrl, model, {});
+
+    return response.data[0].url;
+  }
 }
