@@ -25,6 +25,8 @@ export class Task7Service {
   async executeTask7() {
     const mapDescriptionSystemPrompt = await this.langfuseService.getCompiledPrompt(this.mapDescriptionPromptName);
 
+    const trace = this.langfuseService.createTrace(this.taskName);
+
     const mapDescritpions: { name: string; description: string }[] = await Promise.all(
       this.maps.map(async name => {
         const cachedDescription: string = this.mapsDescriptionCache.get(name);
@@ -33,12 +35,13 @@ export class Task7Service {
         const filePath = join(this.task7AssetsDirectory, `${name}.${this.inputFileExtension}`);
         const image = await fs.readFile(filePath);
         const description = await this.openaiService.singleImageQuery(
-          this.taskName,
+          `Description: ${name}`,
           image.toString('base64'),
           this.inputFileExtension,
           {
             systemPrompt: mapDescriptionSystemPrompt,
-            temperature: 0.8
+            temperature: 0.8,
+            trace
           }
         );
 
@@ -50,10 +53,13 @@ export class Task7Service {
 
     const userQuery = mapDescritpions.map(map => `<${map.name}>${map.description}</${map.name}>`).join('\n\n');
 
-    return {
-      city: await this.openaiService.singleQuery(this.taskName, userQuery, {
-        systemPrompt: await this.langfuseService.getCompiledPrompt(this.findCityPromptName)
-      })
-    };
+    const city = await this.openaiService.singleQuery('Find matching city.', userQuery, {
+      systemPrompt: await this.langfuseService.getCompiledPrompt(this.findCityPromptName),
+      trace
+    });
+
+    this.langfuseService.finalizeTrace(trace);
+
+    return { city };
   }
 }

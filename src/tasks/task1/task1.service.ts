@@ -26,13 +26,18 @@ export class Task1Service {
   async executeTask1(): Promise<string> {
     const loginPageHtml: string = await this.http.get(this.loginPageUrl);
 
+    const trace = this.langfuseService.createTrace(this.taskName);
+
     const loginData = {
       username: this.username,
       password: this.password,
-      answer: await this.openaiService.singleQuery(this.taskName, loginPageHtml, {
+      answer: await this.openaiService.singleQuery('Answer html question', loginPageHtml, {
+        trace,
         systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerHtmlQuestionPromptName)
       })
     };
+
+    this.langfuseService.finalizeTrace(trace);
 
     return this.http.submitFormData(this.loginPageUrl, loginData);
   }

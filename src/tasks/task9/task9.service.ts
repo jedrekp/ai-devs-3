@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { promises as fs } from 'fs';
+import { LangfuseTraceClient } from 'langfuse';
 import { join } from 'path';
 import { HttpClientService } from 'src/shared/http-client/http-client.service';
 import { LangfuseService } from 'src/shared/langfuse/langfuse.service';
@@ -35,23 +36,23 @@ export class Task9Service {
   }
 
   async executeTask9() {
-    const textExtractionFromImageSystemPrompt = await this.langfuseService.getCompiledPrompt(
-      this.textExtractionFromImagePromptName
-    );
-    const categoryAssignmentSystemPrompt = await this.langfuseService.getCompiledPrompt(
-      this.categoryAssignmentPromptName
-    );
-
     const [txtFileNames, mp3FileNames, pngFileNames] = await Promise.all([
       fs.readdir(join(this.task9AssetsDirectory, 'txt')),
       fs.readdir(join(this.task9AssetsDirectory, 'mp3')),
       fs.readdir(join(this.task9AssetsDirectory, 'png'))
     ]);
 
+    const [textExtractionFromImageSystemPrompt, categoryAssignmentSystemPrompt] = await Promise.all([
+      this.langfuseService.getCompiledPrompt(this.textExtractionFromImagePromptName),
+      this.langfuseService.getCompiledPrompt(this.categoryAssignmentPromptName)
+    ]);
+
+    const trace = this.langfuseService.createTrace(this.taskName);
+
     const [readTxtFiles, transcribedMp3Files, readImageFiles] = await Promise.all([
       this.processTxtFiles(txtFileNames),
-      this.processMp3Files(mp3FileNames),
-      this.processImageFiles(pngFileNames, textExtractionFromImageSystemPrompt)
+      this.processMp3Files(mp3FileNames, trace),
+      this.processImageFiles(pngFileNames, textExtractionFromImageSystemPrompt, trace)
     ]);
 
     const allReadFiles: Task9ReadFile[] = [...readTxtFiles, ...transcribedMp3Files, ...readImageFiles];
@@ -60,12 +61,15 @@ export class Task9Service {
       allReadFiles.map(async file => {
         return {
           filename: file.filename,
-          category: await this.openaiService.singleQuery(this.taskName, file.content, {
-            systemPrompt: categoryAssignmentSystemPrompt
+          category: await this.openaiService.singleQuery('Assign category', file.content, {
+            systemPrompt: categoryAssignmentSystemPrompt,
+            trace
           })
         };
       })
     );
+
+    this.langfuseService.finalizeTrace(trace);
 
     const resolvedTask = {
       task: this.taskName,
@@ -101,7 +105,7 @@ export class Task9Service {
     );
   }
 
-  private async processMp3Files(mp3FileNames: string[]): Promise<Task9ReadFile[]> {
+  private async processMp3Files(mp3FileNames: string[], trace?: LangfuseTraceClient): Promise<Task9ReadFile[]> {
     return Promise.all(
       mp3FileNames.map(async filename => {
         const content = this.transcribedMp3Cache.get(filename);
@@ -109,8 +113,9 @@ export class Task9Service {
           return { filename, content };
         }
         const fileBuffer = await fs.readFile(join(this.task9AssetsDirectory, 'mp3', filename));
-        const transcription = await this.openaiService.transcribe(this.taskName, fileBuffer, 'mp3', {
-          description: filename
+        const transcription = await this.openaiService.transcribe(`Transcription: ${filename}`, fileBuffer, 'mp3', {
+          description: filename,
+          trace
         });
         this.transcribedMp3Cache.set(filename, transcription);
         return { filename, content: transcription };
@@ -118,7 +123,11 @@ export class Task9Service {
     );
   }
 
-  private async processImageFiles(pngFileNames: string[], systemPrompt: string): Promise<Task9ReadFile[]> {
+  private async processImageFiles(
+    pngFileNames: string[],
+    systemPrompt: string,
+    trace?: LangfuseTraceClient
+  ): Promise<Task9ReadFile[]> {
     return Promise.all(
       pngFileNames.map(async filename => {
         const content = this.readImageCache.get(filename);
@@ -126,9 +135,15 @@ export class Task9Service {
           return { filename, content };
         }
         const image = await fs.readFile(join(this.task9AssetsDirectory, 'png', filename));
-        const readImage = await this.openaiService.singleImageQuery(this.taskName, image.toString('base64'), 'png', {
-          systemPrompt
-        });
+        const readImage = await this.openaiService.singleImageQuery(
+          `Image description: ${filename}`,
+          image.toString('base64'),
+          'png',
+          {
+            systemPrompt,
+            trace
+          }
+        );
         this.readImageCache.set(filename, readImage);
         return { filename, content: readImage };
       })

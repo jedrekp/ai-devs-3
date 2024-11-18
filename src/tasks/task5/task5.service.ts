@@ -27,9 +27,13 @@ export class Task5Service {
   async executeTask5(): Promise<{ code: number; message: string }> {
     const inputData: string = await this.http.get(this.inputDataUrl);
 
-    const censored = await this.openaiService.singleQuery(this.taskName, inputData, {
+    const trace = this.langfuseService.createTrace(this.taskName);
+
+    const censored = await this.openaiService.singleQuery('Cenzorship', inputData, {
       systemPrompt: await this.langfuseService.getCompiledPrompt(this.censorshipPromptName)
     });
+
+    this.langfuseService.finalizeTrace(trace);
 
     const resolvedTask = {
       task: this.taskName,

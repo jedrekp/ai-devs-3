@@ -31,6 +31,8 @@ export class Task6Service {
   }
 
   async executeTask6(userQuery: string): Promise<{ code: number; message: string }> {
+    const trace = this.langfuseService.createTrace(this.taskName);
+
     const transcriptions: { name: string; transcription: string }[] = await Promise.all(
       this.interrogatees.map(async name => {
         const cachedTranscription: string = this.transcriptionsCache.get(name);
@@ -38,10 +40,16 @@ export class Task6Service {
 
         const filePath = join(this.task6AssetsDirectory, `${name}.${this.inputFileExtension}`);
         const fileBuffer = await fs.readFile(filePath);
-        const transcription = await this.openaiService.transcribe(this.taskName, fileBuffer, this.inputFileExtension, {
-          description: name,
-          language: 'pl'
-        });
+        const transcription = await this.openaiService.transcribe(
+          `Transcription: ${name}`,
+          fileBuffer,
+          this.inputFileExtension,
+          {
+            description: name,
+            language: 'pl',
+            trace
+          }
+        );
 
         this.transcriptionsCache.set(name, transcription);
 
@@ -50,10 +58,13 @@ export class Task6Service {
     );
 
     const context = transcriptions.map(data => `${data.name}:\n${data.transcription}`).join('\n\n');
-    const agentResponse = await this.openaiService.singleQuery(this.taskName, userQuery, {
+    const agentResponse = await this.openaiService.singleQuery('Context based JSON answer', userQuery, {
       systemPrompt: await this.langfuseService.getCompiledPrompt(this.contextBasedAnswerPromptName, { context }),
-      jsonMode: true
+      jsonMode: true,
+      trace
     });
+
+    this.langfuseService.finalizeTrace(trace);
 
     const resolvedTask = {
       task: this.taskName,

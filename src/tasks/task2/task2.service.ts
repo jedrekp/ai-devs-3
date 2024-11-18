@@ -29,12 +29,21 @@ export class Task2Service {
       initCommunicationRequest
     );
 
+    const trace = this.langfuseService.createTrace(this.taskName);
+
     const verificationRequest: Task2CommunicationFormat = {
-      text: await this.openaiService.singleQuery(this.taskName, initCommunicationResponse.text, {
-        systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerQuestionsWithFalseContextPromptName)
-      }),
+      text: await this.openaiService.singleQuery(
+        'Answer questions with false data in context',
+        initCommunicationResponse.text,
+        {
+          systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerQuestionsWithFalseContextPromptName),
+          trace
+        }
+      ),
       msgID: String(initCommunicationResponse.msgID)
     };
+
+    this.langfuseService.finalizeTrace(trace);
 
     return this.http.post(this.verificationPageUrl, verificationRequest);
   }

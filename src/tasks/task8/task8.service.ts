@@ -27,10 +27,19 @@ export class Task8Service {
   async executeTask8() {
     const inputData: { description: string } = await this.http.get(this.inputDataUrl);
 
-    const imageDescription = await this.openaiService.singleQuery(this.taskName, inputData.description, {
-      systemPrompt: await this.langfuseService.getCompiledPrompt(this.generateImagePromptName)
-    });
-    const imageUrl = await this.openaiService.generateImage(this.taskName, imageDescription);
+    const trace = this.langfuseService.createTrace(this.taskName);
+
+    const imageDescription = await this.openaiService.singleQuery(
+      'Image generation input data',
+      inputData.description,
+      {
+        systemPrompt: await this.langfuseService.getCompiledPrompt(this.generateImagePromptName),
+        trace
+      }
+    );
+    const imageUrl = await this.openaiService.generateImage('Generate image', imageDescription, { trace });
+
+    this.langfuseService.finalizeTrace(trace);
 
     const resolvedTask = {
       task: this.taskName,

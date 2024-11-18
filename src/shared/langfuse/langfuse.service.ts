@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Langfuse, { LangfuseGenerationClient, LangfuseTraceClient } from 'langfuse';
+import { generateUUID } from 'src/utils/id.utils';
 
 @Injectable()
 export class LangfuseService {
@@ -21,6 +22,21 @@ export class LangfuseService {
   async getCompiledPrompt(name: string, variables?: Record<string, string>): Promise<string> {
     const prompt = await this.client.getPrompt(name);
     return prompt.compile(variables);
+  }
+
+  createTrace(name: string, data?: { id?: string; input?: unknown }): LangfuseTraceClient {
+    return this.client.trace({
+      id: data?.id ?? generateUUID(),
+      name,
+      ...(data?.input && { input: data.input })
+    });
+  }
+
+  finalizeTrace(trace: LangfuseTraceClient, data?: { output?: unknown }): void {
+    trace.update({
+      ...(data?.output && { output: data.output })
+    });
+    this.client.flushAsync();
   }
 
   createGeneration(name: string, input: unknown, trace?: LangfuseTraceClient): LangfuseGenerationClient {

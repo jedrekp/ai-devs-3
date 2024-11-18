@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { LangfuseTraceClient } from 'langfuse';
 import { HttpClientService } from 'src/shared/http-client/http-client.service';
 import { LangfuseService } from 'src/shared/langfuse/langfuse.service';
 import { OpenaiService } from 'src/shared/openai/openai.service';
@@ -37,8 +38,12 @@ export class Task3Service {
 
     const extendedItems: TestDataExtendedItem[] = inputData['test-data'].filter(item => isTestDataExtendedItem(item));
 
+    const trace = this.langfuseService.createTrace(this.taskName);
+
     const openQuestions = extendedItems.map(item => item.test);
-    const resolvedOpenQuestions = await this.resolveOpenQuestions(openQuestions);
+    const resolvedOpenQuestions = await this.resolveOpenQuestions(openQuestions, trace);
+
+    this.langfuseService.finalizeTrace(trace);
 
     const processedData = {
       ...inputData,
@@ -68,10 +73,15 @@ export class Task3Service {
     };
   }
 
-  private async resolveOpenQuestions(openQuestions: OpenQuestion[]) {
-    const resolvedOpenQuestions = await this.openaiService.singleQuery(this.taskName, JSON.stringify(openQuestions), {
-      systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerMultipleQuestionsPromptName)
-    });
+  private async resolveOpenQuestions(openQuestions: OpenQuestion[], trace?: LangfuseTraceClient) {
+    const resolvedOpenQuestions = await this.openaiService.singleQuery(
+      'answer multiple questions',
+      JSON.stringify(openQuestions),
+      {
+        systemPrompt: await this.langfuseService.getCompiledPrompt(this.answerMultipleQuestionsPromptName),
+        trace
+      }
+    );
     return JSON.parse(resolvedOpenQuestions) as OpenQuestion[];
   }
 
