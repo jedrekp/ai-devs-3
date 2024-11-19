@@ -35,7 +35,7 @@ export class Task9Service {
     this.readTextCache = new Map<string, string>();
   }
 
-  async executeTask9() {
+  async executeTask9(): Promise<{ code: number; message: string }> {
     const [txtFileNames, mp3FileNames, pngFileNames] = await Promise.all([
       fs.readdir(join(this.task9AssetsDirectory, 'txt')),
       fs.readdir(join(this.task9AssetsDirectory, 'mp3')),

@@ -6,8 +6,7 @@ export class Task10Controller {
   constructor(private task10Service: Task10Service) {}
 
   @Get()
-  //executeTask10(): Promise<{ code: number; message: string }> {
-  executeTask10(): Promise<any> {
+  executeTask10(): Promise<{ code: number; message: string }> {
     return this.task10Service.executeTask10();
   }
 }

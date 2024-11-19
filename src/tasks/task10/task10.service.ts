@@ -35,7 +35,7 @@ export class Task10Service {
     this.readImageCache = new Map<string, string>();
   }
 
-  async executeTask10() {
+  async executeTask10(): Promise<{ code: number; message: string }> {
     const articleHtml = await this.http.get(this.articleUrl);
     const { images, mp3s, markdown } = this.convertToMarkDown(articleHtml);
 
