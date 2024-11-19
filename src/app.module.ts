@@ -11,6 +11,7 @@ import { Task6Module } from './tasks/task6/task6.module';
 import { Task7Module } from './tasks/task7/task7.module';
 import { Task8Module } from './tasks/task8/task8.module';
 import { Task9Module } from './tasks/task9/task9.module';
+import { Task10Module } from './tasks/task10/task10.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { Task9Module } from './tasks/task9/task9.module';
     Task6Module,
     Task7Module,
     Task8Module,
-    Task9Module
+    Task9Module,
+    Task10Module
   ]
 })
 export class AppModule {}

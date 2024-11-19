@@ -1,14 +1,19 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, HttpException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { ResponseType } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class HttpClientService {
   constructor(private readonly httpService: HttpService) {}
 
-  async get(url: string): Promise<any> {
+  async get(url: string, responseType?: ResponseType): Promise<any> {
     try {
-      const response = await firstValueFrom(this.httpService.get(url));
+      const response = await firstValueFrom(
+        this.httpService.get(url, {
+          ...(responseType && { responseType: responseType })
+        })
+      );
       return response.data;
     } catch (error) {
       this.handleError(error);
@@ -36,10 +41,7 @@ export class HttpClientService {
   private handleError(error: any): void {
     if (error.response) {
       const { status, data } = error.response;
-      throw new HttpException(
-        `Request failed with status ${status}: ${data?.message || JSON.stringify(data)}`,
-        status,
-      );
+      throw new HttpException(`Request failed with status ${status}: ${data?.message || JSON.stringify(data)}`, status);
     } else {
       throw new HttpException(`Request failed: ${error.message}`, 500);
     }

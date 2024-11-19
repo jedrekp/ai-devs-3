@@ -41,6 +41,7 @@ export class LangfuseService {
 
   createGeneration(name: string, input: unknown, trace?: LangfuseTraceClient): LangfuseGenerationClient {
     const body = {
+      id: generateUUID(),
       name,
       input: typeof input === 'string' ? input : JSON.stringify(input)
     };

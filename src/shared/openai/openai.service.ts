@@ -54,6 +54,7 @@ export class OpenaiService {
     fileExtension: string,
     settings?: {
       systemPrompt?: string;
+      textContent?: string;
       model?: ChatModel;
       trace?: LangfuseTraceClient;
       jsonMode?: boolean;
@@ -73,7 +74,15 @@ export class OpenaiService {
               url: `data:image/${fileExtension};base64,${base64EncodedImage}`,
               detail: settings?.detail ?? 'auto'
             }
-          }
+          },
+          ...(settings?.textContent
+            ? [
+                {
+                  type: 'text' as const,
+                  text: settings.textContent
+                }
+              ]
+            : [])
         ]
       }
     ];

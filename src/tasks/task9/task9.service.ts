@@ -86,7 +86,7 @@ export class Task9Service {
       }
     };
 
-    console.info('resolvedTask', resolvedTask);
+    console.info('resolvedTask', resolvedTask.answer);
 
     return this.http.post(this.reportUrl, resolvedTask);
   }
