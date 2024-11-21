@@ -21,6 +21,19 @@ export class VectorService {
     await this.client.upsert(collectionName, { points });
   }
 
+  async search(
+    collectionName: string,
+    vectorQuery: number[],
+    settings?: { filter?: Record<string, unknown>; limit?: number }
+  ) {
+    return this.client.search(collectionName, {
+      vector: vectorQuery,
+      limit: settings?.limit ?? 5,
+      with_payload: true,
+      ...(settings?.filter && { filter: settings.filter })
+    });
+  }
+
   async deleteAllPoints(collectionName: string): Promise<void> {
     await this.client.delete(collectionName, { filter: {} });
   }

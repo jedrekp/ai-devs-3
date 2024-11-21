@@ -1,4 +1,4 @@
-export type Task12WeaponReport = {
-  data: string;
+export type WeaponReportMetadata = {
+  filename: string;
   reportDate: string;
 };

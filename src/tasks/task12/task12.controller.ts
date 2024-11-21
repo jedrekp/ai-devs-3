@@ -7,6 +7,13 @@ export class Task12Controller {
 
   @Get('preparation')
   prepareData(): Promise<void> {
-    return this.task12Service.prepareData();
+    return this.task12Service.prepareTask12Data();
+  }
+
+  @Get('execution')
+  executeTask12(): Promise<{ code: number; message: string }> {
+    return this.task12Service.executeTask12(
+      'W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?'
+    );
   }
 }
