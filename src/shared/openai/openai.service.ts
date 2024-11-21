@@ -155,4 +155,32 @@ export class OpenaiService {
 
     return response.data[0].url;
   }
+
+  async createEmbedding(
+    title: string,
+    input: string,
+    settings?: {
+      model?: ChatModel;
+      trace?: LangfuseTraceClient;
+      dimensions?: number;
+    }
+  ) {
+    const model = settings?.model ?? 'text-embedding-3-large';
+    const generation = this.langfuseService.createGeneration(title, input, settings?.trace);
+
+    const response = await this.client.embeddings.create({
+      model,
+      input,
+      dimensions: settings?.dimensions ?? 1024
+    });
+
+    const embedding = response.data[0].embedding;
+
+    this.langfuseService.finalizeGeneration(generation, embedding, model, {
+      promptTokens: response.usage?.prompt_tokens,
+      totalTokens: response.usage?.total_tokens
+    });
+
+    return embedding;
+  }
 }

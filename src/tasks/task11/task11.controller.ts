@@ -5,7 +5,7 @@ import { Task11Service } from './task11.service';
 export class Task11Controller {
   constructor(private task11Service: Task11Service) {}
 
-  @Get()
+  @Get('execution')
   executeTask11(): Promise<{ code: number; message: string }> {
     return this.task11Service.executeTask11();
   }

@@ -13,6 +13,8 @@ import { Task8Module } from './tasks/task8/task8.module';
 import { Task9Module } from './tasks/task9/task9.module';
 import { Task10Module } from './tasks/task10/task10.module';
 import { Task11Module } from './tasks/task11/task11.module';
+import { VectorModule } from './shared/vector/vector.module';
+import { Task12Module } from './tasks/task12/task12.module';
 
 @Module({
   imports: [
@@ -31,7 +33,9 @@ import { Task11Module } from './tasks/task11/task11.module';
     Task8Module,
     Task9Module,
     Task10Module,
-    Task11Module
+    Task11Module,
+    VectorModule,
+    Task12Module
   ]
 })
 export class AppModule {}

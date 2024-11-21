@@ -5,7 +5,7 @@ import { Task7Service } from './task7.service';
 export class Task7Controller {
   constructor(private task7Service: Task7Service) {}
 
-  @Get()
+  @Get('execution')
   executeTask7(): Promise<{ city: string }> {
     return this.task7Service.executeTask7();
   }

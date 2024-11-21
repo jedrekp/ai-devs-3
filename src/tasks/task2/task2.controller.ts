@@ -6,7 +6,7 @@ import { Task2CommunicationFormat } from './task2.type';
 export class Task2Controller {
   constructor(private task2Service: Task2Service) {}
 
-  @Get()
+  @Get('execution')
   executeTask2(): Promise<Task2CommunicationFormat> {
     return this.task2Service.executeTask2();
   }
