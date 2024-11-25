@@ -17,6 +17,7 @@ import { VectorModule } from './shared/vector/vector.module';
 import { Task12Module } from './tasks/task12/task12.module';
 import { Task13Module } from './tasks/task13/task13.module';
 import { Task14Module } from './tasks/task14/task14.module';
+import { Task16Module } from './tasks/task16/task16.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { Task14Module } from './tasks/task14/task14.module';
     VectorModule,
     Task12Module,
     Task13Module,
-    Task14Module
+    Task14Module,
+    Task16Module
   ]
 })
 export class AppModule {}
