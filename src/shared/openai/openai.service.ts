@@ -16,13 +16,14 @@ export class OpenaiService {
     userQuery: string,
     settings?: {
       systemPrompt?: string;
+      fineTunedModel?: string;
       model?: ChatModel;
       trace?: LangfuseTraceClient;
       jsonMode?: boolean;
       temperature?: number;
     }
   ): Promise<string> {
-    const model = settings?.model ?? 'gpt-4o';
+    const model = settings.fineTunedModel ?? settings?.model ?? 'gpt-4o';
     const messages: Array<ChatCompletionMessageParam> = [
       { role: 'system', content: settings?.systemPrompt ?? '' },
       { role: 'user', content: userQuery }
